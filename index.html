@@ -1,97 +1,10 @@
-<!-- <!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="UTF-8">
-    <script type="text/javascript" src="connect-streams-min.js"></script>
-</head>
-Add the call to init() as an onload so it will only run once the page is loaded 
-
-
-
-<body onload="init()">
-
-    <iframe src="https://dev-abeamgis.awsapps.com/connect/ccp-v2/" title="softphone"></iframe>
-
-    <div id="container-div" style="width: 400px; height: 800px;"></div>
-    <script type="text/javascript">
-        var containerDiv = document.getElementById("container-div");
-        var instanceURL = "https://dev-abeamgis.awsapps.com/connect/ccp-v2/";
-
-        // initialize the streams api
-        function init() {
-            // initialize the ccp
-            connect.core.initCCP(containerDiv, {
-                ccpUrl: instanceURL,            // REQUIRED
-                loginPopup: true,               // optional, defaults to `true`
-                loginPopupAutoClose: true,      // optional, defaults to `false`
-                loginOptions: {                 // optional, if provided opens login in new window
-                    autoClose: true,              // optional, defaults to `false`
-                    height: 600,                  // optional, defaults to 578
-                    width: 400,                   // optional, defaults to 433
-                    top: 0,                       // optional, defaults to 0
-                    left: 0                       // optional, defaults to 0
-                },
-                region: "eu-central-1",         // REQUIRED for `CHAT`, optional otherwise
-                softphone: {                    // optional, defaults below apply if not provided
-                    allowFramedSoftphone: true,   // optional, defaults to false
-                    disableRingtone: false,       // optional, defaults to false
-                    ringtoneUrl: "./ringtone.mp3" // optional, defaults to CCP’s default ringtone if a falsy value is set
-                },
-                pageOptions: { //optional
-                    enableAudioDeviceSettings: false, //optional, defaults to 'false'
-                    enablePhoneTypeSettings: true //optional, defaults to 'true' 
-                },
-                ccpAckTimeout: 5000, //optional, defaults to 3000 (ms)
-                ccpSynTimeout: 3000, //optional, defaults to 1000 (ms)
-                ccpLoadTimeout: 10000 //optional, defaults to 5000 (ms)
-            });
-
-            connect.contact(function (contact) {
-
-                connect.onIncoming(function (contact) {
-
-                });
-
-                connect.onRefresh(function (contact) {
-
-                });
-
-                connect.onAccepted(function (contact) {
-
-                });
-
-                connect.onEnded(function (contact) {
-
-                });
-
-                connect.onConnected(function () {
-                    console.log(`onConnected(${contact.getContactId()})`);
-                    var attributeMap = contact.getAttributes();
-                    var fName = JSON.stringify(attributeMap["name"]["value"]);
-                    console.log(fName);
-                });
-
-
-            });
-
-        }
-
-
-
-
-
-    </script>
-</body>
-
-</html> -->
-
-
 <!DOCTYPE html>
 <meta charset="UTF-8">
 <html>
 
 <head>
+    <title>Simple Agent Console</title>
+
     <script type="text/javascript" src="connect-streams-min.js"></script>
 </head>
 <!-- Add the call to init() as an onload so it will only run once the page is loaded -->
@@ -100,9 +13,15 @@ Add the call to init() as an onload so it will only run once the page is loaded
     <main>
         <div id="container-div" style="width: 400px; height: 800px;"></div>
 
-        <div id="ccp-container"></div>
-        <div id="customerprofiles-container"></div>
-        <div id="wisdom-container"></div>
+        <section id="section-main">
+            <header>
+                <h1>Amazon Connect CCP Integration Details</h1>
+            </header>
+            <fieldset>
+                <legend>Contact Details</legend>
+                <div id="divDetails"></div>
+            </fieldset>
+        </section>
     </main>
     <script type="text/javascript">
         function init() {
@@ -137,60 +56,34 @@ Add the call to init() as an onload so it will only run once the page is loaded
                 ccpSynTimeout: 3000, //optional, defaults to 1000 (ms)
                 ccpLoadTimeout: 10000 //optional, defaults to 5000 (ms)
             });
-            
-            
-            connect.contact(function (contact) {
-                //--------CCP OnConnecting-----------------
-                contact.onConnected(function (contact) {
-                    console.log("CDEBUG >> " + "onConnecting() >> contactId = " + contact.contactId);
-                    
-                    console.log(`onConnected(${contact.getContactId()})`);
-                    var attributeMap = contact.getAttributes();
-                    var fName = JSON.stringify(attributeMap["name"]["value"]);
-                    console.log(fName);
 
-                    var phoneNumber = contact.getConnections()[1].getAddress()['phoneNumber'];
-
-                    var attributes = contact.getAttributes();
-                    var EmployeeName = attributes["EmployeeName"].value;
-
-                    //add details to DIV
-                    $("#divDetails").append("<hr/> ALERTING CALL " + contact.contactId +
-                        " from " + EmployeeName + " <" + phoneNumber + "> at " + new Date().toLocaleString() + "<br/><br/>");
-                });
-            });
-
-//             connect.agentApp.initApp(
-//                 "ccp",
-//                 "ccp-container",
-//                 connectUrl + "/ccp-v2/",
-//                 { style: "width:400px; height:600px;" }
-//             );
-//             connect.agentApp.initApp(
-//                 "customerprofiles",
-//                 "customerprofiles-container",
-//                 connectUrl + "/customerprofiles-v2/",
-//                 { style: "width:400px; height:600px;" }
-//             );
-//             connect.agentApp.initApp(
-//                 "wisdom",
-//                 "wisdom-container",
-//                 connectUrl + "/wisdom-v2/",
-//                 { style: "width:400px; height:600px;" }
-//             );
         }
+
+        connect.contact(function (contact) {
+            //--------CCP OnConnecting-----------------
+            contact.onConnecting(function (contact) {
+                console.log("CDEBUG >> " + "onConnecting() >> contactId = " + contact.contactId);
+
+                console.log(`onConnected(${contact.getContactId()})`);
+                var attributeMap = contact.getAttributes();
+                var fName = JSON.stringify(attributeMap["name"]["value"]);
+                console.log(fName);
+
+                var phoneNumber = contact.getConnections()[1].getAddress()['phoneNumber'];
+
+                var attributes = contact.getAttributes();
+                var EmployeeName = attributes["EmployeeName"].value;
+
+                //add details to DIV
+                $("#divDetails").append("<hr/> ALERTING CALL " + contact.contactId +
+                    " from " + EmployeeName + " <" + phoneNumber + "> at " + new Date().toLocaleString() + "<br/><br/>");
+            });
+        });
+
     </script>
-    
-    
-    <section id="section-main">
-        <header>
-            <h1>Amazon Connect CCP Integration Details</h1>
-        </header>
-        <fieldset>
-            <legend>Contact Details</legend>
-            <div id="divDetails"></div>
-        </fieldset>
-    </section>
+
+
+
 </body>
 
 </html>
