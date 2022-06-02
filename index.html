@@ -137,27 +137,60 @@ Add the call to init() as an onload so it will only run once the page is loaded
                 ccpSynTimeout: 3000, //optional, defaults to 1000 (ms)
                 ccpLoadTimeout: 10000 //optional, defaults to 5000 (ms)
             });
+            
+            
+            connect.contact(function (contact) {
+                //--------CCP OnConnecting-----------------
+                contact.onConnected(function (contact) {
+                    console.log("CDEBUG >> " + "onConnecting() >> contactId = " + contact.contactId);
+                    
+                    console.log(`onConnected(${contact.getContactId()})`);
+                    var attributeMap = contact.getAttributes();
+                    var fName = JSON.stringify(attributeMap["name"]["value"]);
+                    console.log(fName);
 
-            connect.agentApp.initApp(
-                "ccp",
-                "ccp-container",
-                connectUrl + "/ccp-v2/",
-                { style: "width:400px; height:600px;" }
-            );
-            connect.agentApp.initApp(
-                "customerprofiles",
-                "customerprofiles-container",
-                connectUrl + "/customerprofiles-v2/",
-                { style: "width:400px; height:600px;" }
-            );
-            connect.agentApp.initApp(
-                "wisdom",
-                "wisdom-container",
-                connectUrl + "/wisdom-v2/",
-                { style: "width:400px; height:600px;" }
-            );
+                    var phoneNumber = contact.getConnections()[1].getAddress()['phoneNumber'];
+
+                    var attributes = contact.getAttributes();
+                    var EmployeeName = attributes["EmployeeName"].value;
+
+                    //add details to DIV
+                    $("#divDetails").append("<hr/> ALERTING CALL " + contact.contactId +
+                        " from " + EmployeeName + " <" + phoneNumber + "> at " + new Date().toLocaleString() + "<br/><br/>");
+                });
+            });
+
+//             connect.agentApp.initApp(
+//                 "ccp",
+//                 "ccp-container",
+//                 connectUrl + "/ccp-v2/",
+//                 { style: "width:400px; height:600px;" }
+//             );
+//             connect.agentApp.initApp(
+//                 "customerprofiles",
+//                 "customerprofiles-container",
+//                 connectUrl + "/customerprofiles-v2/",
+//                 { style: "width:400px; height:600px;" }
+//             );
+//             connect.agentApp.initApp(
+//                 "wisdom",
+//                 "wisdom-container",
+//                 connectUrl + "/wisdom-v2/",
+//                 { style: "width:400px; height:600px;" }
+//             );
         }
     </script>
+    
+    
+    <section id="section-main">
+        <header>
+            <h1>Amazon Connect CCP Integration Details</h1>
+        </header>
+        <fieldset>
+            <legend>Contact Details</legend>
+            <div id="divDetails"></div>
+        </fieldset>
+    </section>
 </body>
 
 </html>
